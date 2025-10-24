@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XOX Oyunu - Mükemmel Yapay Zeka</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2.2rem;
+        }
+        
+        .difficulty-info {
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .status {
+            font-size: 1.4rem;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #2c3e50;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 10px;
+            margin: 20px auto;
+            max-width: 300px;
+        }
+        
+        .cell {
+            background-color: #ecf0f1;
+            border: none;
+            border-radius: 10px;
+            font-size: 2.5rem;
+            font-weight: bold;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .cell:hover {
+            background-color: #d5dbdb;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .cell.x {
+            color: #e74c3c;
+        }
+        
+        .cell.o {
+            color: #3498db;
+        }
+        
+        .controls {
+            margin-top: 25px;
+        }
+        
+        button {
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:hover {
+            background-color: #1a252f;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .youtube-btn {
+            background-color: #ff0000;
+            margin-top: 15px;
+        }
+        
+        .youtube-btn:hover {
+            background-color: #cc0000;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .ai-thinking {
+            font-style: italic;
+            color: #7f8c8d;
+            margin-top: 10px;
+            min-height: 24px;
+        }
+        
+        .ai-level {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .challenge-text {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .warning {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            color: #856404;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .cell {
+                height: 80px;
+                font-size: 2rem;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>XOX Oyunu - Mükemmel Yapay Zeka</h1>
+        
+        <div class="difficulty-info">
+            Zorluk: MATEMATİKSEL OLARAK İMKANSIZ - Kazanma şansınız %0!
+        </div>
+        
+        <div class="status" id="status">Sıra: Siz (X)</div>
+        
+        <div class="board" id="board">
+            <!-- Hücreler JavaScript ile oluşturulacak -->
+        </div>
+        
+        <div class="ai-thinking" id="aiThinking"></div>
+        
+        <div class="ai-level" id="aiLevel">AI Seviyesi: Mükemmel (Minimax + Alpha-Beta)</div>
+        
+        <div class="challenge-text" id="challengeText">
+            Mücadele: Bu AI'ya karşı kazanabilir misin? (İpucu: Hayır!)
+        </div>
+        
+        <div class="controls">
+            <button id="restartBtn">Yeniden Başlat</button>
+        </div>
+        
+        <!-- YouTube Abone Ol Butonu -->
+        <button class="youtube-btn" onclick="window.open('https://www.youtube.com/@mtechnow', '_blank')">
+            YouTube Kanalıma Abone Ol!
+        </button>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="userWins">0</div>
+                <div class="stat-label">Sizin Kazanma</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="aiWins">0</div>
+                <div class="stat-label">AI Kazanma</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="draws">0</div>
+                <div class="stat-label">Beraberlik</div>
+            </div>
+        </div>
+        
+        <!-- UYARI MESAJI -->
+        <div class="warning">
+            ⚠️ UYARI: Bu yazılım özel mülktür ve kullanımı yasaktır! 
+            Hiçbir şekilde kopyalanamaz, dağıtılamaz veya kullanılamaz!
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Oyun durumu
+            const gameState = {
+                board: Array(9).fill(''),
+                currentPlayer: 'X', // Kullanıcı X ile başlar
+                gameActive: true,
+                userWins: 0,
+                aiWins: 0,
+                draws: 0,
+                aiLevel: 'mükemmel'
+            };
+
+            // DOM elementleri
+            const boardElement = document.getElementById('board');
+            const statusElement = document.getElementById('status');
+            const aiThinkingElement = document.getElementById('aiThinking');
+            const aiLevelElement = document.getElementById('aiLevel');
+            const challengeTextElement = document.getElementById('challengeText');
+            const restartBtn = document.getElementById('restartBtn');
+            const userWinsElement = document.getElementById('userWins');
+            const aiWinsElement = document.getElementById('aiWins');
+            const drawsElement = document.getElementById('draws');
+
+            // Oyun tahtasını oluştur
+            function createBoard() {
+                boardElement.innerHTML = '';
+                for (let i = 0; i < 9; i++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    cell.setAttribute('data-index', i);
+                    cell.addEventListener('click', () => handleCellClick(i));
+                    boardElement.appendChild(cell);
+                }
+            }
+
+            // Hücre tıklama işleyicisi
+            function handleCellClick(index) {
+                if (!gameState.gameActive || gameState.board[index] !== '' || gameState.currentPlayer !== 'X') {
+                    return;
+                }
+
+                // Kullanıcının hamlesini yap
+                makeMove(index, 'X');
+                
+                // Oyun devam ediyorsa AI hamlesini yap
+                if (gameState.gameActive) {
+                    setTimeout(makeAIMove, 800);
+                }
+            }
+
+            // Hamle yap
+            function makeMove(index, player) {
+                gameState.board[index] = player;
+                const cell = document.querySelector(`.cell[data-index="${index}"]`);
+                cell.textContent = player;
+                cell.classList.add(player.toLowerCase());
+                
+                // Kazananı kontrol et
+                if (checkWinner()) {
+                    gameState.gameActive = false;
+                    if (player === 'X') {
+                        statusElement.textContent = 'İNANILMAZ! Kazandınız! (Bu bir hata olmalı)';
+                        gameState.userWins++;
+                        userWinsElement.textContent = gameState.userWins;
+                        challengeTextElement.textContent = "Tebrikler! Bu gerçekten şaşırtıcı!";
+                    } else {
+                        statusElement.textContent = 'AI kazandı! (Beklendiği gibi)';
+                        gameState.aiWins++;
+                        aiWinsElement.textContent = gameState.aiWins;
+                        challengeTextElement.textContent = "AI'ya karşı kazanmak matematiksel olarak imkansızdır!";
+                    }
+                    return;
+                }
+                
+                // Beraberliği kontrol et
+                if (isBoardFull()) {
+                    gameState.gameActive = false;
+                    statusElement.textContent = 'Berabere! (En iyi ihtimal)';
+                    gameState.draws++;
+                    drawsElement.textContent = gameState.draws;
+                    challengeTextElement.textContent = "Berabere bile büyük bir başarı!";
+                    return;
+                }
+                
+                // Sırayı değiştir
+                gameState.currentPlayer = player === 'X' ? 'O' : 'X';
+                statusElement.textContent = `Sıra: ${gameState.currentPlayer === 'X' ? 'Siz (X)' : 'AI (O)'}`;
+            }
+
+            // AI hamlesini yap
+            function makeAIMove() {
+                if (!gameState.gameActive || gameState.currentPlayer !== 'O') {
+                    return;
+                }
+
+                aiThinkingElement.textContent = "Mükemmel AI derin düşünüyor...";
+                
+                // AI'nın hamlesini hecaplamak için kısa bir gecikme
+                setTimeout(() => {
+                    const bestMove = findBestMove();
+                    makeMove(bestMove, 'O');
+                    aiThinkingElement.textContent = "";
+                }, 600);
+            }
+
+            // Mükemmel AI için minimax algoritması
+            function findBestMove() {
+                let bestScore = -Infinity;
+                let bestMove;
+                
+                // Tüm olası hamleleri değerlendir
+                for (let i = 0; i < 9; i++) {
+                    if (gameState.board[i] === '') {
+                        gameState.board[i] = 'O';
+                        let score = minimax(gameState.board, 0, false, -Infinity, Infinity);
+                        gameState.board[i] = '';
+                        
+                        if (score > bestScore) {
+                            bestScore = score;
+                            bestMove = i;
+                        }
+                    }
+                }
+                
+                return bestMove;
+            }
+
+            // Minimax algoritması (Alpha-Beta budama ile optimize edilmiş)
+            function minimax(board, depth, isMaximizing, alpha, beta) {
+                // Oyun sonu durumlarını kontrol et
+                const winner = getWinner(board);
+                if (winner === 'O') return 10 - depth;
+                if (winner === 'X') return depth - 10;
+                if (isBoardFull(board)) return 0;
+                
+                if (isMaximizing) {
+                    let bestScore = -Infinity;
+                    for (let i = 0; i < 9; i++) {
+                        if (board[i] === '') {
+                            board[i] = 'O';
+                            let score = minimax(board, depth + 1, false, alpha, beta);
+                            board[i] = '';
+                            bestScore = Math.max(score, bestScore);
+                            alpha = Math.max(alpha, score);
+                            if (beta <= alpha) break; // Alpha-beta budama
+                        }
+                    }
+                    return bestScore;
+                } else {
+                    let bestScore = Infinity;
+                    for (let i = 0; i < 9; i++) {
+                        if (board[i] === '') {
+                            board[i] = 'X';
+                            let score = minimax(board, depth + 1, true, alpha, beta);
+                            board[i] = '';
+                            bestScore = Math.min(score, bestScore);
+                            beta = Math.min(beta, score);
+                            if (beta <= alpha) break; // Alpha-beta budama
+                        }
+                    }
+                    return bestScore;
+                }
+            }
+
+            // Kazananı kontrol et
+            function checkWinner() {
+                return getWinner(gameState.board) !== null;
+            }
+
+            // Kazananı belirle
+            function getWinner(board) {
+                const winPatterns = [
+                    [0, 1, 2], [3, 4, 5], [6, 7, 8], // Yatay
+                    [0, 3, 6], [1, 4, 7], [2, 5, 8], // Dikey
+                    [0, 4, 8], [2, 4, 6]             // Çapraz
+                ];
+
+                for (let pattern of winPatterns) {
+                    const [a, b, c] = pattern;
+                    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                        return board[a];
+                    }
+                }
+
+                return null;
+            }
+
+            // Tahta dolu mu kontrol et
+            function isBoardFull(board = gameState.board) {
+                return board.every(cell => cell !== '');
+            }
+
+            // Oyunu sıfırla
+            function resetGame() {
+                gameState.board = Array(9).fill('');
+                gameState.currentPlayer = 'X';
+                gameState.gameActive = true;
+                statusElement.textContent = 'Sıra: Siz (X)';
+                aiThinkingElement.textContent = '';
+                challengeTextElement.textContent = "Mücadele: Bu AI'ya karşı kazanabilir misin? (İpucu: Hayır!)";
+                createBoard();
+            }
+
+            // Yeniden başlat butonu
+            restartBtn.addEventListener('click', resetGame);
+
+            // Oyunu başlat
+            createBoard();
+        });
+    </script>
+</body>
+</html>
